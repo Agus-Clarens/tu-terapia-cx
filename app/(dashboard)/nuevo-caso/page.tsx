@@ -56,11 +56,15 @@ export default function NuevoCasoPage() {
   }
 
   async function getNextNroCaso(): Promise<string> {
-    const { data } = await supabase
-      .from('casos').select('nro_caso').order('created_at', { ascending: false }).limit(1)
-    if (!data || data.length === 0) return 'TKT-001'
-    const num = parseInt(data[0].nro_caso.replace('TKT-', ''), 10)
-    return `TKT-${(num + 1).toString().padStart(3, '0')}`
+    const { data: lastCaso } = await supabase
+      .from('casos')
+      .select('nro_caso')
+      .order('created_at', { ascending: false })
+      .limit(1)
+    const lastNum = lastCaso?.[0]?.nro_caso
+      ? parseInt(lastCaso[0].nro_caso.replace('TKT-', ''))
+      : 0
+    return `TKT-${String(lastNum + 1).padStart(3, '0')}`
   }
 
   async function handleSubmit() {
