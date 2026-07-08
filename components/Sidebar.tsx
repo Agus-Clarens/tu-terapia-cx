@@ -14,19 +14,22 @@ const NAV = [
 
 function Ilustracion() {
   return (
-    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', opacity: 0.25 }}>
-      {/* Persona sentada con laptop */}
-      <circle cx="80" cy="30" r="14" fill="none" stroke="#75B781" strokeWidth="2.5"/>
-      <path d="M60 55 Q80 45 100 55 L105 90 H55 Z" fill="none" stroke="#75B781" strokeWidth="2.5"/>
-      <rect x="45" y="72" width="70" height="42" rx="4" fill="none" stroke="#75B781" strokeWidth="2.5"/>
-      <rect x="50" y="77" width="60" height="32" rx="2" fill="none" stroke="#75B781" strokeWidth="1.5"/>
-      <line x1="40" y1="114" x2="120" y2="114" stroke="#75B781" strokeWidth="2.5" strokeLinecap="round"/>
-      {/* Burbuja de dialogo */}
-      <rect x="95" y="15" width="40" height="28" rx="6" fill="none" stroke="#75B781" strokeWidth="2"/>
-      <path d="M100 43 L96 50 L108 43" fill="none" stroke="#75B781" strokeWidth="2"/>
-      <circle cx="107" cy="29" r="2" fill="#75B781"/>
-      <circle cx="115" cy="29" r="2" fill="#75B781"/>
-      <circle cx="123" cy="29" r="2" fill="#75B781"/>
+    <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', opacity: 0.28 }}>
+      {/* Persona con laptop */}
+      <circle cx="80" cy="28" r="13" fill="none" stroke="#75B781" strokeWidth="2.5"/>
+      <path d="M62 52 Q80 43 98 52 L103 85 H57 Z" fill="none" stroke="#75B781" strokeWidth="2.5"/>
+      <rect x="46" y="70" width="68" height="40" rx="4" fill="none" stroke="#75B781" strokeWidth="2.5"/>
+      <rect x="51" y="75" width="58" height="30" rx="2" fill="none" stroke="#75B781" strokeWidth="1.5"/>
+      <line x1="40" y1="110" x2="120" y2="110" stroke="#75B781" strokeWidth="2.5" strokeLinecap="round"/>
+      {/* Burbuja */}
+      <rect x="96" y="12" width="38" height="26" rx="6" fill="none" stroke="#75B781" strokeWidth="2"/>
+      <path d="M101 38 L98 45 L110 38" fill="none" stroke="#75B781" strokeWidth="2"/>
+      <circle cx="107" cy="25" r="2" fill="#75B781"/>
+      <circle cx="115" cy="25" r="2" fill="#75B781"/>
+      <circle cx="123" cy="25" r="2" fill="#75B781"/>
+      {/* Frase con estilo manuscrito usando font cursive */}
+      <text x="80" y="130" textAnchor="middle" fontFamily="Georgia, serif" fontSize="9.5" fill="#75B781" fontStyle="italic" opacity="0.9">juntas llegamos</text>
+      <text x="80" y="144" textAnchor="middle" fontFamily="Georgia, serif" fontSize="9.5" fill="#75B781" fontStyle="italic" opacity="0.9">más lejos 🌿</text>
     </svg>
   )
 }
@@ -76,7 +79,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div style={{ padding: '0 20px 8px' }}>
+      <div style={{ padding: '0 20px 4px' }}>
         <Ilustracion />
       </div>
 
