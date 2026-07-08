@@ -12,6 +12,25 @@ const NAV = [
   { href: '/descuentos', label: 'Descuentos' },
 ]
 
+function Ilustracion() {
+  return (
+    <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', opacity: 0.25 }}>
+      {/* Persona sentada con laptop */}
+      <circle cx="80" cy="30" r="14" fill="none" stroke="#75B781" strokeWidth="2.5"/>
+      <path d="M60 55 Q80 45 100 55 L105 90 H55 Z" fill="none" stroke="#75B781" strokeWidth="2.5"/>
+      <rect x="45" y="72" width="70" height="42" rx="4" fill="none" stroke="#75B781" strokeWidth="2.5"/>
+      <rect x="50" y="77" width="60" height="32" rx="2" fill="none" stroke="#75B781" strokeWidth="1.5"/>
+      <line x1="40" y1="114" x2="120" y2="114" stroke="#75B781" strokeWidth="2.5" strokeLinecap="round"/>
+      {/* Burbuja de dialogo */}
+      <rect x="95" y="15" width="40" height="28" rx="6" fill="none" stroke="#75B781" strokeWidth="2"/>
+      <path d="M100 43 L96 50 L108 43" fill="none" stroke="#75B781" strokeWidth="2"/>
+      <circle cx="107" cy="29" r="2" fill="#75B781"/>
+      <circle cx="115" cy="29" r="2" fill="#75B781"/>
+      <circle cx="123" cy="29" r="2" fill="#75B781"/>
+    </svg>
+  )
+}
+
 export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
@@ -27,15 +46,15 @@ export default function Sidebar() {
       background: '#264534', display: 'flex', flexDirection: 'column',
       padding: '24px 0', zIndex: 40,
     }}>
-      <div style={{ padding: '0 20px 24px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: 8 }}>
+      <div style={{ padding: '0 20px 20px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: 8 }}>
         <Image
           src="/logo.png"
           alt="Tu Terapia"
-          width={140}
-          height={56}
+          width={160}
+          height={64}
           style={{ mixBlendMode: 'screen', objectFit: 'contain' }}
         />
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
           Gestión de Casos Internos
         </div>
       </div>
@@ -56,6 +75,10 @@ export default function Sidebar() {
           )
         })}
       </nav>
+
+      <div style={{ padding: '0 20px 8px' }}>
+        <Ilustracion />
+      </div>
 
       <div style={{ padding: '0 12px 12px' }}>
         <Link href="/nuevo-caso" style={{
