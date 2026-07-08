@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 
@@ -27,14 +28,15 @@ export default function Sidebar() {
       padding: '24px 0', zIndex: 40,
     }}>
       <div style={{ padding: '0 20px 24px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: 8 }}>
-        <div style={{
-          fontSize: 20, fontWeight: 700, color: '#FEFAF5',
-          mixBlendMode: 'screen', letterSpacing: -0.3,
-        }}>
-          🌿 Tu Terapia
-        </div>
+        <Image
+          src="/logo.png"
+          alt="Tu Terapia"
+          width={140}
+          height={56}
+          style={{ mixBlendMode: 'screen', objectFit: 'contain' }}
+        />
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>
-          Gestión de Casos
+          Gestión de Casos Internos
         </div>
       </div>
 
