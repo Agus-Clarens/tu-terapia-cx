@@ -5,11 +5,11 @@ import { usePathname, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 
 const NAV = [
-  { href: '/casos', label: 'Todos los casos', icon: '🗂' },
-  { href: '/admin', label: 'Admin', icon: '🏛' },
-  { href: '/talent', label: 'Talent', icon: '🎯' },
-  { href: '/cx', label: 'CX', icon: '💬' },
-  { href: '/descuentos', label: 'Descuentos', icon: '💰' },
+  { href: '/casos', label: 'Todos los casos' },
+  { href: '/admin', label: 'Admin' },
+  { href: '/talent', label: 'Talent' },
+  { href: '/cx', label: 'CX' },
+  { href: '/descuentos', label: 'Descuentos' },
 ]
 
 export default function Sidebar() {
@@ -41,18 +41,17 @@ export default function Sidebar() {
       </div>
 
       <nav style={{ flex: 1, padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {NAV.map(({ href, label, icon }) => {
+        {NAV.map(({ href, label }) => {
           const active = pathname === href
           return (
             <Link key={href} href={href} style={{
-              display: 'flex', alignItems: 'center', gap: 10,
+              display: 'flex', alignItems: 'center',
               padding: '10px 12px', borderRadius: 8, textDecoration: 'none',
               fontSize: 14, fontWeight: active ? 600 : 400,
               color: active ? '#fff' : 'rgba(255,255,255,0.6)',
               background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
             }}>
-              <span style={{ fontSize: 16 }}>{icon}</span>
-              <span>{label}</span>
+              {label}
             </Link>
           )
         })}
