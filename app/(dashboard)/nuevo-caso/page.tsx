@@ -2,35 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../../lib/supabase'
-import { CARGADO_POR, PAISES, TIPOS_CASO, getTipoCasoInfo } from '../../../lib/constants'
-
-interface FormData {
-  cargado_por: string
-  pais: string
-  pac_nombre: string
-  pac_mail: string
-  sin_psi: boolean
-  psi_nombre: string
-  psi_mail: string
-  tipo_caso: string
-  descripcion: string
-  monto_descuento: string
-  mes_descuento: string
-}
-
-const INITIAL: FormData = {
-  cargado_por: CARGADO_POR[0],
-  pais: 'Argentina',
-  pac_nombre: '',
-  pac_mail: '',
-  sin_psi: false,
-  psi_nombre: '',
-  psi_mail: '',
-  tipo_caso: '',
-  descripcion: '',
-  monto_descuento: '',
-  mes_descuento: '',
-}
+import { CARGADO_POR, PAISES, TIPOS_CASO, getTipoCasoInfo, MESES } from '../../../lib/constants'
 
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '10px 12px', borderRadius: 8,
@@ -39,232 +11,187 @@ const inputStyle: React.CSSProperties = {
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>{children}</div>
+  return <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 4 }}>{children}</label>
 }
 
-export default function NuevoCasoPage() {
-  const [form, setForm] = useState<FormData>(INITIAL)
-  const [saving, setSaving] = useState(false)
-  const [success, setSuccess] = useState('')
-  const [error, setError] = useState('')
+export default function NuevoCaso() {
   const router = useRouter()
+  const [cargado_por, setCargadoPor] = useState(CARGADO_POR[0])
+  const [pais, setPais] = useState('Argentina')
+  const [pac_nombre, setPacNombre] = useState('')
+  const [pac_mail, setPacMail] = useState('')
+  const [sin_psi, setSinPsi] = useState(false)
+  const [psi_nombre, setPsiNombre] = useState('')
+  const [psi_mail, setPsiMail] = useState('')
+  const [tipo_caso, setTipoCaso] = useState('')
+  const [descripcion, setDescripcion] = useState('')
+  const [monto_descuento, setMonto] = useState('')
+  const [mes_descuento, setMes] = useState('Enero')
+  const [tipo_sesion, setTipoSesion] = useState('Presencial')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const tipoCasoInfo = form.tipo_caso ? getTipoCasoInfo(form.tipo_caso) : null
-
-  function set<K extends keyof FormData>(field: K, value: FormData[K]) {
-    setForm(prev => ({ ...prev, [field]: value }))
-  }
-
-  async function getNextNroCaso(): Promise<string> {
-    const { data: lastCaso } = await supabase
-      .from('casos')
-      .select('nro_caso')
-      .order('created_at', { ascending: false })
-      .limit(1)
-    const lastNum = lastCaso?.[0]?.nro_caso
-      ? parseInt(lastCaso[0].nro_caso.replace('TKT-', ''))
-      : 0
-    return `TKT-${String(lastNum + 1).padStart(3, '0')}`
-  }
+  const tipoCasoInfo = tipo_caso ? getTipoCasoInfo(tipo_caso) : null
+  const requiere_descuento = tipoCasoInfo?.requiere_descuento || false
+  const area = tipoCasoInfo?.area || ''
 
   async function handleSubmit() {
-    if (!form.pac_nombre || !form.pac_mail || !form.tipo_caso || !form.descripcion) {
-      setError('Completar todos los campos obligatorios.')
-      return
+    if (!pac_nombre || !pac_mail || !tipo_caso || !descripcion) {
+      setError('Completá todos los campos obligatorios.'); return
     }
-    if (tipoCasoInfo?.requiere_descuento && (!form.monto_descuento || !form.mes_descuento)) {
-      setError('Este tipo de caso requiere monto y mes de descuento.')
-      return
-    }
-    setSaving(true)
-    setError('')
+    setLoading(true); setError('')
     try {
-      const nro_caso = await getNextNroCaso()
-      const today = new Date().toISOString().split('T')[0]
+      const { data: last } = await supabase.from('casos').select('nro_caso').order('created_at', { ascending: false }).limit(1)
+      const lastNum = last?.[0]?.nro_caso ? parseInt(last[0].nro_caso.replace('TKT-', '')) : 0
+      const nro_caso = `TKT-${String(lastNum + 1).padStart(3, '0')}`
 
-      const { data: newCaso, error: err } = await supabase.from('casos').insert({
+      const { error: err } = await supabase.from('casos').insert({
         nro_caso,
-        fecha: today,
-        cargado_por: form.cargado_por,
-        pais: form.pais,
-        pac_nombre: form.pac_nombre,
-        pac_mail: form.pac_mail,
-        psi_nombre: form.sin_psi ? null : (form.psi_nombre || null),
-        psi_mail: form.sin_psi ? null : (form.psi_mail || null),
-        tipo_caso: form.tipo_caso,
-        area: tipoCasoInfo?.area,
-        descripcion: form.descripcion,
+        fecha: new Date().toISOString().split('T')[0],
+        cargado_por, pais, pac_nombre, pac_mail,
+        psi_nombre: sin_psi ? null : psi_nombre,
+        psi_mail: sin_psi ? null : psi_mail,
+        tipo_caso, area, descripcion,
         estado: 'Nuevo',
-        requiere_descuento: tipoCasoInfo?.requiere_descuento ?? false,
-        monto_descuento: tipoCasoInfo?.requiere_descuento ? parseFloat(form.monto_descuento) : null,
-        mes_descuento: tipoCasoInfo?.requiere_descuento ? form.mes_descuento : null,
-      }).select().single()
+        estado_admin: 'Pendiente',
+        estado_talent: 'Pendiente',
+        estado_cx: 'Pendiente',
+        requiere_descuento,
+        monto_descuento: requiere_descuento ? Number(monto_descuento) : null,
+        mes_descuento: requiere_descuento ? mes_descuento : null,
+        tipo_sesion: requiere_descuento ? tipo_sesion : null,
+      })
 
-      if (err) throw err
+      if (err) { setError('Error: ' + err.message); setLoading(false); return }
 
-      if (tipoCasoInfo?.requiere_descuento && newCaso) {
-        await supabase.from('descuentos_psicologo').insert({
-          caso_id: newCaso.id,
-          nro_caso: newCaso.nro_caso,
-          psi_nombre: form.psi_nombre,
-          psi_mail: form.psi_mail,
-          pac_nombre: form.pac_nombre,
-          motivo: form.tipo_caso,
-          monto: parseFloat(form.monto_descuento),
-          mes: form.mes_descuento,
-          estado: 'Pendiente',
-        })
+      if (requiere_descuento) {
+        const { data: caso } = await supabase.from('casos').select('id').eq('nro_caso', nro_caso).single()
+        if (caso) {
+          await supabase.from('descuentos_psicologo').insert({
+            caso_id: caso.id, nro_caso,
+            psi_nombre, psi_mail, pac_nombre,
+            motivo: tipo_caso,
+            monto: Number(monto_descuento),
+            mes: mes_descuento,
+            estado: 'Pendiente',
+            tipo_sesion,
+            descripcion,
+          })
+        }
       }
 
-      setSuccess(`Caso ${nro_caso} creado exitosamente.`)
-      setForm(INITIAL)
-      setTimeout(() => router.push('/casos'), 1800)
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Error al crear el caso.')
-    } finally {
-      setSaving(false)
+      fetch('/api/notify-slack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nro_caso, area, tipo_caso, pac_nombre, cargado_por, pais })
+      })
+
+      router.push('/casos')
+    } catch (e) {
+      setError('Error inesperado: ' + (e as Error).message)
     }
+    setLoading(false)
   }
 
   return (
-    <div style={{ maxWidth: 700 }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#264534', margin: 0 }}>Nuevo caso</h1>
-      </div>
-
-      <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #f0ede8', padding: '32px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-
-          <div>
-            <Label>Cargado por</Label>
-            <select value={form.cargado_por} onChange={e => set('cargado_por', e.target.value)} style={inputStyle}>
-              {CARGADO_POR.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
-          </div>
-
-          <div>
-            <Label>País</Label>
-            <select value={form.pais} onChange={e => set('pais', e.target.value)} style={inputStyle}>
-              {PAISES.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
-          </div>
-
-          <div>
-            <Label>Nombre paciente *</Label>
-            <input type="text" value={form.pac_nombre} onChange={e => set('pac_nombre', e.target.value)} style={inputStyle} placeholder="Nombre completo" />
-          </div>
-
-          <div>
-            <Label>Email paciente *</Label>
-            <input type="email" value={form.pac_mail} onChange={e => set('pac_mail', e.target.value)} style={inputStyle} placeholder="paciente@mail.com" />
-          </div>
-
-          <div style={{ gridColumn: '1/-1' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: '#374151' }}>
-              <input
-                type="checkbox"
-                checked={form.sin_psi}
-                onChange={e => set('sin_psi', e.target.checked)}
-                style={{ width: 16, height: 16, accentColor: '#007271', cursor: 'pointer' }}
-              />
-              No necesita datos del psicólogo
-            </label>
-          </div>
-
-          {!form.sin_psi && (
-            <>
-              <div>
-                <Label>Nombre psicólogo</Label>
-                <input type="text" value={form.psi_nombre} onChange={e => set('psi_nombre', e.target.value)} style={inputStyle} placeholder="Nombre completo" />
-              </div>
-              <div>
-                <Label>Email psicólogo</Label>
-                <input type="email" value={form.psi_mail} onChange={e => set('psi_mail', e.target.value)} style={inputStyle} placeholder="psicologo@mail.com" />
-              </div>
-            </>
-          )}
-
-          <div style={{ gridColumn: '1/-1' }}>
-            <Label>Tipo de caso *</Label>
-            <select value={form.tipo_caso} onChange={e => set('tipo_caso', e.target.value)} style={inputStyle}>
-              <option value="">Seleccionar tipo de caso...</option>
-              {Object.entries(TIPOS_CASO).map(([group, config]) => (
-                <optgroup key={group} label={group}>
-                  {config.tipos.map(t => <option key={t} value={t}>{t}</option>)}
-                </optgroup>
-              ))}
-            </select>
-            {tipoCasoInfo && (
-              <div style={{ fontSize: 12, color: '#007271', marginTop: 5, fontWeight: 500 }}>
-                Área asignada: {tipoCasoInfo.area}
-                {tipoCasoInfo.requiere_descuento && ' · Requiere descuento'}
-              </div>
-            )}
-          </div>
-
-          {tipoCasoInfo?.requiere_descuento && (
-            <>
-              <div>
-                <Label>Monto descuento *</Label>
-                <input
-                  type="number"
-                  value={form.monto_descuento}
-                  onChange={e => set('monto_descuento', e.target.value)}
-                  style={inputStyle}
-                  placeholder="0"
-                  min="0"
-                />
-              </div>
-              <div>
-                <Label>Mes descuento *</Label>
-                <input
-                  type="text"
-                  value={form.mes_descuento}
-                  onChange={e => set('mes_descuento', e.target.value)}
-                  style={inputStyle}
-                  placeholder="Ej: Julio 2026"
-                />
-              </div>
-            </>
-          )}
-
-          <div style={{ gridColumn: '1/-1' }}>
-            <Label>Descripción *</Label>
-            <textarea
-              value={form.descripcion}
-              onChange={e => set('descripcion', e.target.value)}
-              rows={4}
-              style={{ ...inputStyle, resize: 'vertical' }}
-              placeholder="Describir el caso en detalle..."
-            />
-          </div>
+    <div style={{ maxWidth: 640, margin: '0 auto', padding: 24 }}>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#264534', marginBottom: 24 }}>Nuevo caso</h1>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div>
+          <Label>Cargado por</Label>
+          <select value={cargado_por} onChange={e => setCargadoPor(e.target.value)} style={inputStyle}>
+            {CARGADO_POR.map(o => <option key={o}>{o}</option>)}
+          </select>
         </div>
-
-        {error && (
-          <div style={{ color: '#EF4444', fontSize: 13, marginTop: 16, padding: '10px 14px', background: '#FEF2F2', borderRadius: 8 }}>
-            {error}
-          </div>
-        )}
-        {success && (
-          <div style={{ color: '#059669', fontSize: 13, marginTop: 16, padding: '10px 14px', background: '#D1FAE5', borderRadius: 8 }}>
-            {success}
-          </div>
-        )}
-
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 24 }}>
-          <button
-            onClick={handleSubmit}
-            disabled={saving}
-            style={{
-              padding: '12px 36px', borderRadius: 10, border: 'none',
-              background: '#007271', color: '#fff', fontSize: 14, fontWeight: 600,
-              cursor: 'pointer', opacity: saving ? 0.7 : 1,
-            }}
-          >
-            {saving ? 'Creando...' : 'Crear caso'}
-          </button>
+        <div>
+          <Label>País</Label>
+          <select value={pais} onChange={e => setPais(e.target.value)} style={inputStyle}>
+            {PAISES.map(p => <option key={p}>{p}</option>)}
+          </select>
+        </div>
+        <div>
+          <Label>Nombre paciente *</Label>
+          <input value={pac_nombre} onChange={e => setPacNombre(e.target.value)} style={inputStyle} />
+        </div>
+        <div>
+          <Label>Email paciente *</Label>
+          <input type="email" value={pac_mail} onChange={e => setPacMail(e.target.value)} style={inputStyle} />
         </div>
       </div>
+
+      <div style={{ margin: '16px 0' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14 }}>
+          <input type="checkbox" checked={sin_psi} onChange={e => setSinPsi(e.target.checked)} />
+          No necesita datos del psicólogo
+        </label>
+      </div>
+
+      {!sin_psi && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div>
+            <Label>Nombre psicólogo</Label>
+            <input value={psi_nombre} onChange={e => setPsiNombre(e.target.value)} style={inputStyle} />
+          </div>
+          <div>
+            <Label>Email psicólogo</Label>
+            <input type="email" value={psi_mail} onChange={e => setPsiMail(e.target.value)} style={inputStyle} />
+          </div>
+        </div>
+      )}
+
+      <div style={{ marginBottom: 16 }}>
+        <Label>Tipo de caso *</Label>
+        <select value={tipo_caso} onChange={e => setTipoCaso(e.target.value)} style={inputStyle}>
+          <option value="">Seleccionar...</option>
+          {Object.entries(TIPOS_CASO).map(([grupo, config]) => (
+            <optgroup key={grupo} label={grupo}>
+              {config.tipos.map(t => <option key={t} value={t}>{t}</option>)}
+            </optgroup>
+          ))}
+        </select>
+        {tipoCasoInfo && (
+          <p style={{ fontSize: 12, marginTop: 4, color: '#007271', fontWeight: 600 }}>
+            Área: {tipoCasoInfo.area}{tipoCasoInfo.requiere_descuento ? ' · Requiere descuento' : ''}
+          </p>
+        )}
+      </div>
+
+      {requiere_descuento && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div>
+            <Label>Monto descuento *</Label>
+            <input type="number" value={monto_descuento} onChange={e => setMonto(e.target.value)} style={inputStyle} />
+          </div>
+          <div>
+            <Label>Mes *</Label>
+            <select value={mes_descuento} onChange={e => setMes(e.target.value)} style={inputStyle}>
+              {MESES.map(m => <option key={m}>{m}</option>)}
+            </select>
+          </div>
+          <div>
+            <Label>Tipo sesión</Label>
+            <select value={tipo_sesion} onChange={e => setTipoSesion(e.target.value)} style={inputStyle}>
+              <option>Presencial</option>
+              <option>Online</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      <div style={{ marginBottom: 16 }}>
+        <Label>Descripción *</Label>
+        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
+      </div>
+
+      {error && <p style={{ color: '#EF4444', marginBottom: 12, fontSize: 13 }}>{error}</p>}
+
+      <button onClick={handleSubmit} disabled={loading} style={{
+        width: '100%', background: '#007271', color: '#fff', border: 'none',
+        borderRadius: 8, padding: '12px 0', fontSize: 15, fontWeight: 700,
+        cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1
+      }}>
+        {loading ? 'Creando...' : 'Crear caso'}
+      </button>
     </div>
   )
 }
