@@ -52,7 +52,7 @@ export default function Sidebar() {
           alt="Tu Terapia"
           width={200}
           height={80}
-          style={{ mixBlendMode: 'screen', objectFit: 'contain', width: '100%', height: 'auto' }}
+          style={{ mixBlendMode: 'screen', objectFit: 'contain', width: "140px", height: "auto" }}
         />
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
           Gestión de Casos Internos
