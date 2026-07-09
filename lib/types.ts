@@ -12,6 +12,9 @@ export interface Caso {
   area: string
   descripcion: string
   estado: string
+  estado_admin: string | null
+  estado_talent: string | null
+  estado_cx: string | null
   requiere_descuento: boolean
   monto_descuento: number | null
   mes_descuento: string | null

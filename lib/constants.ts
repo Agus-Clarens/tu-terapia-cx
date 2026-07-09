@@ -96,7 +96,7 @@ export function calcularEstadoGlobal(area: string, estado_admin?: string, estado
   }
   if (area === 'Admin+Talent') {
     if (ea === 'Cerrado' && et === 'Cerrado') return 'Cerrado'
-    if (ea === 'En curso' || et === 'En curso') return 'En curso'
+    if (ea === 'Cerrado' || et === 'Cerrado' || ea === 'En curso' || et === 'En curso') return 'En curso'
     return 'Nuevo'
   }
   return 'Nuevo'
