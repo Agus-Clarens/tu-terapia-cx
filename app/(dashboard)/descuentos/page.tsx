@@ -23,8 +23,24 @@ export default function DescuentosPage() {
     setDescuentos(prev => prev.map(d => d.id === id ? { ...d, estado: 'Aplicado' } : d))
   }
 
+  const buildMensaje = (d: any) => `Hola ${d.psi_nombre}! 👋
+
+Te escribimos para avisarte que en tu próxima liquidación se realizará un descuento.
+
+👤 Paciente: ${d.pac_nombre}
+💻 Tipo de sesión: ${d.tipo_sesion || 'Presencial'}
+💰 Monto: $${d.monto}
+
+Motivo: ${d.descripcion || d.motivo}
+
+Ante cualquier consulta no dudes en escribirnos, estamos para ayudarte.
+
+¡Saludos! 🌿
+Sofía
+Equipo Tu Terapia`
+
   function copiarMensaje(d: Descuento) {
-    const msg = `Hola ${d.psi_nombre}, te informamos que se aplicó un descuento de $${d.monto} en tu liquidación del mes de ${d.mes} correspondiente al caso ${d.nro_caso}. Cualquier consulta estamos a disposición. ¡Saludos, Sofía! 🌿 Equipo Tu Terapia`
+    const msg = buildMensaje(d)
     navigator.clipboard.writeText(msg)
     setCopiedId(d.id)
     setTimeout(() => setCopiedId(null), 2000)
