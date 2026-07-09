@@ -15,19 +15,16 @@ const NAV = [
 function Ilustracion() {
   return (
     <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', opacity: 0.28 }}>
-      {/* Persona con laptop */}
       <circle cx="80" cy="28" r="13" fill="none" stroke="#75B781" strokeWidth="2.5"/>
       <path d="M62 52 Q80 43 98 52 L103 85 H57 Z" fill="none" stroke="#75B781" strokeWidth="2.5"/>
       <rect x="46" y="70" width="68" height="40" rx="4" fill="none" stroke="#75B781" strokeWidth="2.5"/>
       <rect x="51" y="75" width="58" height="30" rx="2" fill="none" stroke="#75B781" strokeWidth="1.5"/>
       <line x1="40" y1="110" x2="120" y2="110" stroke="#75B781" strokeWidth="2.5" strokeLinecap="round"/>
-      {/* Burbuja */}
       <rect x="96" y="12" width="38" height="26" rx="6" fill="none" stroke="#75B781" strokeWidth="2"/>
       <path d="M101 38 L98 45 L110 38" fill="none" stroke="#75B781" strokeWidth="2"/>
       <circle cx="107" cy="25" r="2" fill="#75B781"/>
       <circle cx="115" cy="25" r="2" fill="#75B781"/>
       <circle cx="123" cy="25" r="2" fill="#75B781"/>
-      {/* Frase con estilo manuscrito usando font cursive */}
       <text x="80" y="130" textAnchor="middle" fontFamily="Georgia, serif" fontSize="9.5" fill="#75B781" fontStyle="italic" opacity="0.9">juntas llegamos</text>
       <text x="80" y="144" textAnchor="middle" fontFamily="Georgia, serif" fontSize="9.5" fill="#75B781" fontStyle="italic" opacity="0.9">más lejos 🌿</text>
     </svg>
@@ -47,15 +44,15 @@ export default function Sidebar() {
     <div style={{
       position: 'fixed', top: 0, left: 0, width: 240, height: '100vh',
       background: '#264534', display: 'flex', flexDirection: 'column',
-      padding: '24px 0', zIndex: 40,
+      padding: '20px 0', zIndex: 40,
     }}>
-      <div style={{ padding: '0 20px 20px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: 8 }}>
+      <div style={{ padding: '0 16px 20px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: 8 }}>
         <Image
           src="/logo.png"
           alt="Tu Terapia"
-          width={160}
-          height={64}
-          style={{ mixBlendMode: 'screen', objectFit: 'contain' }}
+          width={200}
+          height={80}
+          style={{ mixBlendMode: 'screen', objectFit: 'contain', width: '100%', height: 'auto' }}
         />
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
           Gestión de Casos Internos
