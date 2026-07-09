@@ -213,3 +213,5 @@ export function CasoCard({
     </div>
   )
 }
+
+export default CasoCard
